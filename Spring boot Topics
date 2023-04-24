@@ -1,3 +1,6 @@
+* how to create a spring boot application?
+
+
 1) Generating the logger file 
 2) creating the Rest API's
 3) Calling the SQL from the property file\
