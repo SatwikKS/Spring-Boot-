@@ -1,0 +1,24 @@
+1) Generating the logger file 
+2) creating the Rest API's
+3) Calling the SQL from the property file\
+4) connecting / detecting the DB with multiple Data bases
+5) Doing the Batch update/ insert /Transactions
+6) Pagination 
+7) spring Data JPA : hibernate , 
+8) working with JSON 
+9) Working with GSON
+10) Server admin, client
+11) Actuator
+12) Security
+13) Exception Handling / GLobal Exception Handling
+14) File Handling / Servlet Response
+15) Excel, CSV, PDF, FTP, SFTP, New File/ latest file selection
+16) Email Sending 
+17) JaxB 
+18) Socket Programming
+19) Spring cloud - service discovery, cloud config, gateway, load balance, Feign
+20) Internationalization
+21) Unit Testing - Mockito, Integration
+
+
+
