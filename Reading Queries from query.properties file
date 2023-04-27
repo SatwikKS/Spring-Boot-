@@ -1,0 +1,43 @@
+1) Create a class with one Map private field 
+
+
+@PropertySource(value ="classpath:queries.properties")
+
+@Configuration
+@ConfigurationProperties
+public class AppQueries{
+
+private Map<String, String> queries;
+
+  public AppQueries(){
+  super();
+  }
+
+  public AppQueries(Map<String,String> queries){
+  super()
+  this.queries =queries;
+  }
+  
+  public Map<String,String> getQueries(){
+  return queries;
+  }
+
+  public void set Queries(Map<String,String> queries){
+  this.queries = queries;
+  }
+}
+
+
+2) Autowire the AppQueries in DaoImpl
+
+@Autowired 
+AppQueries appQueries;
+
+
+3) call the query 
+
+appQueries.getQueries.get("query Name")  ; get method is from MAP 
+
+4) queries.properties file
+
+queries.queryName : query
