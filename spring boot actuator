@@ -11,3 +11,43 @@
  management.enpoints.web.exposure.include =health,info
  management.info.env.enabled =true
  
+ 3) add custom endpoints
+ 
+ info.app.name = myApplicateName
+ info.app.description = A crazy and fun App
+ info.app.version  = 1.0.0
+ 
+ /auditevents
+ /beans
+ /mappings
+ /threaddump
+ 
+ To know all actuator endpoints
+ 
+ www.luv2code.com/actuator-endpoints
+ 
+ use wildcard * to expose all endpoints
+ can also expose individual endpoints with a comma-delimited list
+ 
+ management.endpoints.web.exposure.include =*
+ 
+ Add the extension :
+   www.luv2code.com/chrome-json-formatter
+   
+ 
+ Securing End Points:
+ --------------------
+ 
+ 
+ 
+ Dev tools:
+ =========
+ <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-devtools</artifactId>
+      <scope>runtime</scope>
+      <optional>true</optional>
+    </dependency>
+    
+    
+ 
