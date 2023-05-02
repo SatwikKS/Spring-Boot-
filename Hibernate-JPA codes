@@ -1,0 +1,33 @@
+JPA: Jakarta persistence API  // earlier java persistence API
+
+www.luv2code.com/jpa-vendors
+
+hibernate is the widely used vendors implementation.
+
+
+persist()  ->save
+find(pojo.class, Id)  -> find by id
+typedQuery<Pojo> theQuery  = entityManager.createQuery("from table", pojo.class);
+List<pojo> pojoList  = theQuery.getResultList();
+merge() ->update //  find pojo, setter update date, merge (pojo)
+remove() -> delete // getbyid, delete by calling remove
+
+Addd the dependencies:
+mysql connector
+spring data jpa
+
+spring.main.banner-mode=off;
+
+
+@Entity
+@Table(name="tableName");
+
+@Column(name="");
+
+@Id
+@GeneratedValue(strategy= generationType.IDENTITY)  //AUTO,IDENTITY, SEQUENCE,TABLE
+
+custom implementation:
+create a class and implement org.hibernate.id.IdentifierGenerator
+
+public Serialize generate() method..
