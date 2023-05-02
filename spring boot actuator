@@ -1,0 +1,13 @@
+
+1) Add the spring boot actuator dependency
+
+   <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+ 
+ 2) add the management endpoints, by default /health is exposed
+ 
+ management.enpoints.web.exposure.include =health,info
+ management.info.env.enabled =true
+ 
