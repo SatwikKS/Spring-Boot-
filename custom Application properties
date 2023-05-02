@@ -5,3 +5,25 @@ spring.application.name =Application Name
 @Value ("${spring.application.name}")
 private String appName;
 
+
+
+List of common properties:
+------------------------
+www.luv2code.com/spring-boot-props
+
+
+Also set props fro package names:     WWW.LUV2CODE.COM/spring-boot-logging
+---------------------------------
+logging.level.org.springframework =DEBUG  ********* log levels: TRACE,DEBUG,INFO,WARN,ERROR,FATAL,OFF ***************
+logging.level.org.hibernate = TRACE
+logging.level.com.luv2code =INFO
+
+logging.file = filename.log
+
+
+
+
+server.port =8080;
+server.servlet.context-path =/my-silly-app
+server.servlet.session.timeout = 15m
+
