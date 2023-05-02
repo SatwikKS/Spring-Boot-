@@ -1,0 +1,9 @@
+
+to run spring boot application from command line terminal:
+
+1) java -jar jarname.jar
+2) mvnw  spring-boot:run
+
+mvnw clean compile test
+
+if maven is already installed, then use mvn clean install
