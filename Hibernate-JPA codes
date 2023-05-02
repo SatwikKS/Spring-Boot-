@@ -7,7 +7,7 @@ hibernate is the widely used vendors implementation.
 
 persist()  ->save
 find(pojo.class, Id)  -> find by id
-typedQuery<Pojo> theQuery  = entityManager.createQuery("from table", pojo.class);
+typedQuery<Pojo> theQuery  = entityManager.createQuery("from table", pojo.class);. executeUpdate();
 List<pojo> pojoList  = theQuery.getResultList();
 merge() ->update //  find pojo, setter update date, merge (pojo)
 remove() -> delete // getbyid, delete by calling remove
@@ -31,3 +31,7 @@ custom implementation:
 create a class and implement org.hibernate.id.IdentifierGenerator
 
 public Serialize generate() method..
+
+spring.jpa.hibernate.ddl-auto = none,create-only,drop, create, create-drop
+
+
