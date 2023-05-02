@@ -38,6 +38,14 @@
  Securing End Points:
  --------------------
  
+ spring.security.user.name= scott
+ spring.security.user.password = tiger
+ 
+ Exclude end points:
+ ---------------
+  management.endpoints.web.exposure.exclude = health, info
+ 
+ 
  
  
  Dev tools:
