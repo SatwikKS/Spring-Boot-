@@ -7,3 +7,29 @@ to run spring boot application from command line terminal:
 mvnw clean compile test
 
 if maven is already installed, then use mvn clean install
+
+Sping initializer generally provides:
+
+maven build:
+<build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+  
+ 
+ we can use this build plugin to package application to jar/ war 
+ also we can easily run the app
+ 
+ ./mvnw package
+ ./mvnw spring-boot:run
+ 
+ mvn package
+ mvn spring-boot: run
+ 
+ stop using ctrl+ c from command prompt
+ 
+ 
