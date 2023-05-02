@@ -27,3 +27,9 @@ server.port =8080;
 server.servlet.context-path =/my-silly-app
 server.servlet.session.timeout = 15m
 
+spring.security.user.name=satwik
+spring.security.user.password =tiger
+
+spring.jdbc.url
+spring.jdbc.username,password, driver
+
