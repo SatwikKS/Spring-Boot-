@@ -44,6 +44,10 @@
  Exclude end points:
  ---------------
   management.endpoints.web.exposure.exclude = health, info
+  
+More details on actuator documentation:
+-----------------------------------------
+www.luv2code.com/actuator-docs
  
  
  
