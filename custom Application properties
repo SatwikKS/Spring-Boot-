@@ -1,0 +1,7 @@
+Application.properties file
+
+spring.application.name =Application Name
+
+@Value ("${spring.application.name}")
+private String appName;
+
