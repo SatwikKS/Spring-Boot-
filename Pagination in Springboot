@@ -1,0 +1,337 @@
+
+1> Prerequisites is Page Object
+
+package com.adidas.waaloscommon.pagination;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Page<E> {
+	private int pageNumber;
+	private int pagesAvailable;
+	private int totalNoOfRecords;
+	
+	private List<E> pageItems = new ArrayList<E>();
+
+	public void setPageNumber(int pageNumber) {
+		this.pageNumber = pageNumber;
+	}
+
+	public void setPagesAvailable(int pagesAvailable) {
+		this.pagesAvailable = pagesAvailable;
+	}
+
+	public void setPageItems(List<E> pageItems) {
+		this.pageItems = pageItems;
+	}
+
+	public int getTotalNoOfRecords() {
+		return totalNoOfRecords;
+	}
+
+	public void setTotalNoOfRecords(int totalNoOfRecords) {
+		this.totalNoOfRecords = totalNoOfRecords;
+	}
+
+	public int getPageNumber() {
+		return pageNumber;
+	}
+
+	public int getPagesAvailable() {
+		return pagesAvailable;
+	}
+
+	public List<E> getPageItems() {
+		return pageItems;
+	}
+}
+
+
+2> Controller class
+
+
+	@Autowired
+	WmsAddService service;
+
+/**
+	 * Fetches all the marked SKU's
+	 * 
+	 * @param dcName
+	 * @param userName
+	 * @param pageSize
+	 * @param pageNumber
+	 * @return Page<MarkedSkuDto>
+	 */
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = TopSkuDto.class, responseContainer = "Object") })
+	@RequestMapping(method = RequestMethod.GET, value = "/markedSkus", produces = "application/hal+json")
+	public @ResponseBody Object getMarkedSkus(@RequestParam(value = "dcName") String dcName,
+			@RequestParam(value = "userName") String userName, @RequestParam(value = "pageSize") int pageSize,
+			@RequestParam(value = "pageNumber") int pageNumber) {
+		LOGGER.info(" Entering getTopSkus method in Controller at : {}", System.currentTimeMillis());
+		Page<MarkedSkuDto> markedSkuDtoPg = null;
+		try {
+			markedSkuDtoPg = service.getMarkedSkus(dcName, pageSize, pageNumber);
+			if (markedSkuDtoPg.getPageItems().isEmpty()) {
+				return new WaalosResponse(WaalosConstants.ERR9999_CODE, WaalosConstants.NO_DATA_FOUND);
+			} else {
+				return markedSkuDtoPg;
+			}
+		} finally {
+			LOGGER.info(" Exiting getTopSkus method in Controller at : {}", System.currentTimeMillis());
+		}
+
+	}
+	
+
+3> Service Class
+
+
+public Page<MarkedSkuDto> getMarkedSkus(String dcName, int pageSize, int pageNumber) {
+		int[] pageInfoArr = setPageSizeAndPageNbr(pageSize, pageNumber);
+		return wmsAddDao.getMarkedSkus(dcName, pageInfoArr[0], pageInfoArr[1]);
+	}
+
+
+public int[] setPageSizeAndPageNbr(int pgSize, int pgNbr) {
+		int[] pageInfoArr = new int[2];
+		int pageNo;
+		int pageSize;
+		if (pgNbr == 0) {
+			pageNo = 1;
+		} else {
+			pageNo = pgNbr;
+		}
+		if (pgSize == 0) {
+			pageSize = 15;
+		} else {
+			pageSize = pgSize;
+		}
+		pageInfoArr[0] = pageSize;
+		pageInfoArr[1] = pageNo;
+		return pageInfoArr;
+	}
+	
+	
+
+4> DAO class
+
+Page<MarkedSkuDto> getMarkedSkus(String dcName,int pageSize,int pageNumber);
+
+5> Dao Impl class
+
+
+	
+	@SuppressWarnings("rawtypes")
+	@Autowired
+	WmsAddPaginationHelper wmsAddPaginationHlpr;
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Page<MarkedSkuDto> getMarkedSkus(String dcName, int pageSize, int pageNumber) {
+		LOGGER.info(" Entering into getMarkedSkus method in WmsAddDaoImpl : {} ", System.currentTimeMillis());
+		JdbcTemplate wmsaddJdbcTemplate = null;
+		String sqlQuery = null;
+		String sqlCountQuery = null;
+		Page<MarkedSkuDto> markedSkuDtoPg = null;
+		try {
+			// Based on the DC name passed connect to the relevant database and
+			// create a JdbcTemplate
+			wmsaddJdbcTemplate = wmsAddDbIdentification.identifyDatabase(dcName);
+			if (wmsaddJdbcTemplate == null) {
+				LOGGER.error("Failed to create database connection for DC: {} ", WaalosConstants.HELIOS);
+				throw new WaalosException(WaalosConstants.ERR9999_CODE, WaalosConstants.ERR9999_MSG);
+			} else {
+				wmsaddJdbcTemplate.setFetchSize(WaalosConstants.FETCHSIZE_50);
+				if(dcName.equals(WaalosConstants.ONE_WMS_CDC_DC)) {
+					sqlQuery = wmsAddQueries.getQueries().get(WmsAddConstants.GET_ONEWMS_MARKED_SKUS);
+					sqlCountQuery = wmsAddQueries.getQueries().get(WmsAddConstants.GET_ONEWMS_MARKED_SKUS_COUNT);
+                  	markedSkuDtoPg = wmsAddPaginationHlpr.fetchPage(wmsaddJdbcTemplate, sqlCountQuery, sqlQuery, null,
+							pageNumber, pageSize, new OneWMSMarkedSkuDtoMapper());
+				} else {
+					sqlQuery = wmsAddQueries.getQueries().get(WmsAddConstants.GET_MARKED_SKUS);
+					sqlCountQuery = wmsAddQueries.getQueries().get(WmsAddConstants.GET_MARKED_SKUS_COUNT);
+                  	markedSkuDtoPg = wmsAddPaginationHlpr.fetchPage(wmsaddJdbcTemplate, sqlCountQuery, sqlQuery, null,
+						pageNumber, pageSize, new MarkedSkuDtoMapper());
+				}
+				
+			}
+		} catch (DataAccessException ex) {
+			LOGGER.error("Exception while getting Marked Skus data    ", ex);
+		} finally {
+			if (wmsaddJdbcTemplate != null) {
+				wmsaddJdbcTemplate.setFetchSize(WaalosConstants.FETCHSIZE_0);
+				wmsaddJdbcTemplate = null;
+			}
+			sqlQuery = null;
+			sqlCountQuery = null;
+		}
+		LOGGER.info("Exiting getMarkedSkus method in WmsAddDaoImpl : {}", System.currentTimeMillis());
+		return markedSkuDtoPg;
+	}
+	
+	
+6> Pagination helper class
+
+package com.adidas.wmsadd.util;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Component;
+
+import com.adidas.waaloscommon.pagination.Page;
+
+@Component
+public class WmsAddPaginationHelper<E> {
+	@SuppressWarnings("unchecked")
+
+	public Page<E> fetchPage(final JdbcTemplate jt, final String sqlCountRows, final String sqlFetchRows,
+			final Object args[], final int pageNo, final int pageSize, final RowMapper<E> rowMapper) {
+
+		// determine how many rows are available
+		final int rowCount = jt.queryForObject(sqlCountRows, args, Integer.class);
+
+		// calculate the number of pages
+		int pageCount = rowCount / pageSize;
+		if (rowCount > pageSize * pageCount) {
+			pageCount++;
+		}
+
+		// create the page object
+		final Page<E> page = new Page<E>();
+		page.setPageNumber(pageNo);
+		page.setPagesAvailable(pageCount);
+		page.setTotalNoOfRecords(rowCount);
+
+		// fetch a single page of results
+		final int startRow = (pageNo - 1) * pageSize;
+		jt.query(sqlFetchRows, args, new ResultSetExtractor() {
+			public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
+				final List pageItems = page.getPageItems();
+				int currentRow = 0;
+				while (rs.next() && currentRow < startRow + pageSize) {
+					if (currentRow >= startRow) {
+						pageItems.add(rowMapper.mapRow(rs, currentRow));
+					}
+					currentRow++;
+				}
+				return page;
+			}
+		});
+		return page;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Page<E> fetchpage(final NamedParameterJdbcTemplate jt, final String sqlCountRows, final String sqlFetchRows,
+			final Map<String, ?> args, final int pageNo, final int pageSize, final RowMapper<E> rowMapper) {
+
+		// determine how many rows are available
+		final int rowCount = jt.queryForObject(sqlCountRows, args, Integer.class);
+
+		// calculate the number of pages
+		int pageCount = rowCount / pageSize;
+		if (rowCount > pageSize * pageCount) {
+			pageCount++;
+		}
+
+		// create the page object
+		final Page<E> page = new Page<>();
+		page.setPageNumber(pageNo);
+		page.setPagesAvailable(pageCount);
+		page.setTotalNoOfRecords(rowCount);
+
+		// fetch a single page of results
+		final int startRow = (pageNo - 1) * pageSize;
+		jt.query(sqlFetchRows, args, new ResultSetExtractor() {
+			@Override
+			public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
+				final List pageItems = page.getPageItems();
+				int currentRow = 0;
+				while (rs.next() && currentRow < startRow + pageSize) {
+					if (currentRow >= startRow) {
+						pageItems.add(rowMapper.mapRow(rs, currentRow));
+					}
+					currentRow++;
+				}
+				return page;
+			}
+		});
+		return page;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Page<E> fetchPage(final NamedParameterJdbcTemplate jt, final String sqlCountRows, final String sqlFetchRows,
+			final Map<String, ?> args, final int pageNo, final int pageSize, final RowMapper<E> rowMapper) {
+
+		// determine how many rows are available
+		final int rowCount = jt.queryForObject(sqlCountRows, args, Integer.class);
+
+		// calculate the number of pages
+		int pageCount = rowCount / pageSize;
+		if (rowCount > pageSize * pageCount) {
+			pageCount++;
+		}
+
+		// create the page object
+		final Page<E> page = new Page<>();
+		page.setPageNumber(pageNo);
+		page.setPagesAvailable(pageCount);
+		page.setTotalNoOfRecords(rowCount);
+
+		// fetch a single page of results
+		final int startRow = (pageNo - 1) * pageSize;
+		jt.query(sqlFetchRows, args, new ResultSetExtractor() {
+			@Override
+			public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
+				final List pageItems = page.getPageItems();
+				int currentRow = 0;
+				while (rs.next() && currentRow < startRow + pageSize) {
+					if (currentRow >= startRow) {
+						pageItems.add(rowMapper.mapRow(rs, currentRow));
+					}
+					currentRow++;
+				}
+				return page;
+			}
+		});
+		return page;
+	}
+
+}
+
+
+
+7> Maprow class in DAOIMPL
+
+
+package com.adidas.wmsadd.mapper;
+
+import java.sql.ResultSet;
+
+public class MarkedSkuDtoMapper implements RowMapper<MarkedSkuDto>{
+
+	@Override
+	public MarkedSkuDto mapRow(ResultSet rs, int rowNum) throws SQLException {
+		MarkedSkuDto markedSkuDto = new MarkedSkuDto();
+		markedSkuDto.setSkuId(rs.getString("sku_id"));
+		markedSkuDto.setWeek(rs.getString("entry_week"));
+		markedSkuDto.setEndWeek(rs.getString("exit_week"));
+		markedSkuDto.setPriority(rs.getString("prio"));
+		markedSkuDto.setComment(rs.getString("instruction"));
+		return markedSkuDto;
+	}
+
+}
+
+
+	
+	
+
